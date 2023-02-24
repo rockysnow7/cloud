@@ -10,6 +10,8 @@ SEND_PORT = 8001
 
 DATA_SIZE = 1024
 
+PEERS = ["192.168.0.12"]
+
 
 class Peer:
     def __init__(self) -> None:
@@ -22,13 +24,19 @@ class Peer:
         self.__send_socket.bind((HOST, SEND_PORT))
 
         self.__is_running = False
-        self.__peers = set()
         self.__files_uploaded = dict[str, str]
 
     def __exit(self) -> None:
         self.__is_running = False
         self.__send_socket.connect((HOST, RECV_PORT))
         self.__send_socket.sendall(b"")
+
+    def __upload_file(self) -> None:
+        self.__send_socket.connect((PEERS[0], RECV_PORT))
+        self.__send_socket.sendall(b"hey")
+
+    def __download_file(self) -> None:
+        ...
 
     def __bounce_loop(self) -> None:
         while self.__is_running:
@@ -53,6 +61,10 @@ class Peer:
 
             if action == "exit":
                 self.__exit()
+            elif action == "upload a file":
+                self.__upload_file()
+            elif action == "download a file":
+                self.__download_file()
 
     def run(self) -> None:
         self.__is_running = True
